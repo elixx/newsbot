@@ -5,7 +5,7 @@ import configparser
 
 class Config(object):
     filename = 'config.conf'
-    VERSION="v0.95"
+    VERSION="v0.999998"
 
     config = configparser.ConfigParser()
 
@@ -33,6 +33,10 @@ class Config(object):
         broadcast = True
     else:
         broadcast = False
+    if(config.get('newsbot','debug') == "True"):
+        debug = True
+    else:
+        debug = False
     feedURLstring = config.get('feeds','feeds')
     feedURLs = feedURLstring.split(',')
 
