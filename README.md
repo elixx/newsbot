@@ -2,7 +2,7 @@
 
 RSS reader bot for Mattermost (and possibly Slack).
 
-Requires Python 3 w/ configparser, hashids, and matterhook
+Requires Python 3 w/ configparser, hashids, feedparser, and matterhook
 
 Run without a `config.conf` to generate a base one. Example config:
 

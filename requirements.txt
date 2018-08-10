@@ -1,3 +1,4 @@
 configparser
 hashids
 matterhook
+feedparser
