@@ -5,7 +5,7 @@ import configparser
 
 class Config(object):
     filename = 'config.conf'
-    VERSION="v0.999998"
+    VERSION="v0.9a"
 
     config = configparser.ConfigParser()
 
@@ -29,6 +29,7 @@ class Config(object):
     channelname = config.get('newsbot','channelname')
     username = config.get('newsbot','username')
     refresh = int(config.get('newsbot','refresh'))
+    maxi = int(config.get('newsbot','max'))
     if(config.get('newsbot','broadcast') == "True"):
         broadcast = True
     else:
