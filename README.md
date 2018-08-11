@@ -31,4 +31,7 @@ feeds = https://news.ycombinator.com/rss,http://catless.ncl.ac.uk/risksrss2.xml
 * `feeds` - comma delimited list of RSS locations
 * `debug` - verbose console
 
+## Screenshot:
 ![screenshot](newsbot-capture.PNG)
+## Console screenshot:
+![console_screenshot](newsbot-capture2.PNG)
