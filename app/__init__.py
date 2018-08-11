@@ -11,6 +11,18 @@ from random import shuffle
 from time import sleep
 from matterhook import Webhook
 
+########### debug output ###########
+#def z(*s):
+#    if(config.debug == True):
+#        try:
+#            print(' '.join(s))
+#        except:
+#            print(str(s))
+def z(*text):
+    if(config.debug == True):
+        s=''
+        for n in text: s += str(n) + ' '
+        print('debug |\t',s)
 ########### arbitrarily hashid a string with salt from config SECRET_KEY ###########
 def id_from_string(string):
     val = []
@@ -23,8 +35,10 @@ def id_from_string(string):
 
 ########### take article data and arbitrarily generate hashid ###########
 def id_from_arti(title, source):
-    if(len(title)<16): title += "................"
-    if(len(source)<9): source += "........."
+    if(len(title)<16):
+        title += (16-len(title))*"."
+    if(len(source)<9):
+        source += (9-len(title))*"."
     return(id_from_string(title[-16]+source[1:9]))
 
 ########### article object from rss feed ###########
@@ -42,6 +56,7 @@ class article(object):
         else:
             self.stamp = stamp
         if(self.id == ''):
+            if(self.title==''): self.title=self.link
             self.id = id_from_arti(self.title,self.source)
         else:
             self.id = id
@@ -53,11 +68,14 @@ class article(object):
 ########### rss feed object ###########
 class RSSfeed(object):
     def __init__(self, url,maxi=15):
-        if(config.debug==True): print("RSSfeed init()")
+        z("RSSfeed init()")
         self.articles = {}
         d = feedparser.parse(url)
         self.source = url
-        self.title = d['feed']['title']
+        try:
+            self.title = d['feed']['title']
+        except KeyError:
+            self.title = url
         self.max = maxi
 # return all articles as markdown string and mark articles as seen
     def output(self):
@@ -71,37 +89,37 @@ class RSSfeed(object):
         return(a)
 # update articles[] from feedparser
     def refresh(self):
-        if(config.debug==True): print("feed.refresh()",self.source)
+        z("feed.refresh()",self.source)
         count = 0
         d = feedparser.parse(self.source)
         for entry in d['entries']:
-            if(config.debug==True): print("refresh() Processing entry " + str(count))
+            z("refresh() Processing entry " + str(count))
             if(count > self.max): break
             try:
                 stamp = entry['published']
             except KeyError:
                 stamp = ''
-            if(config.debug==True): print("\t Timestamp is " + str(stamp))
+            z("\t Timestamp is " + str(stamp))
             id = id_from_arti(str(entry['title']),self.source)
-            if(config.debug==True): print("\trefresh id is " + id)
-            if(config.debug==True): print("\trefresh title is " + entry['title'])
+            z("\trefresh id is " + id)
+            z("\trefresh title is " + entry['title'])
             art = article(id=id,title=str(entry['title']), link=str(entry['link']),source=str(self.source),stamp=stamp)
             try:
                 assert(self.articles[id] is not None)
-                if(config.debug==True): print("\trefresh: Article exists")
+                z("\trefresh: Article exists")
             except KeyError:
                 self.articles[id] = art
-                if(config.debug==True): print("\trefresh: New article created",id)
+                z("\trefresh: New article created",id)
             count += 1
         self.last_updated = datetime.datetime.now()
 # count unseen articles
     def unseen(self):
         count = 0
+        z("RSSfeed.unseen()")
         for arti in self.articles.values():
-            if(config.debug==True): print("RSSfeed.unseen(): " + arti.id,arti.seen,arti.tostr())
             if(arti.seen == False):
                 count += 1
-        if(config.debug==True): print("Unseen articles:",count)
+        z("Unseen articles:",count)
         return(count)
 
 ######################## init ########################
@@ -134,22 +152,22 @@ if(config.broadcast == True):
 def run():
     allfeeds = []
     for url in config.feedURLs:
-        if(config.debug==True): print("(main) loading RSSfeeds from feedURLs: " + url)
+        z("(main) loading RSSfeeds from feedURLs: " + url)
         feed = RSSfeed(url=url)
         allfeeds.append(feed)
 
     while True:
         for feed in allfeeds:
-            if(config.debug==True): print("(main) refreshing " + feed.source)
+            z("(main) refreshing " + feed.source)
             feed.refresh()
             if(feed.unseen() > 0):
-                if(config.debug==True): print("(main) unseen > 0, calling output()...")
+                z("(main) unseen > 0, calling output()...")
                 output = feed.output()
                 print(output)
                 if(config.broadcast == True):
                     mwh.send(output)
-            if(config.debug==True): print("(main) sleeping outputdelay",outputdelay,"...")
+            z("(main) sleeping outputdelay",outputdelay,"...")
             sleep(outputdelay)
-        if(config.debug==True): print("(main) sleeping refresh",refresh,"...")
+        z("(main) sleeping refresh",refresh,"...")
         sleep(refresh)
 
