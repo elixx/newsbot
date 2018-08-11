@@ -6,6 +6,7 @@ import configparser
 class Config(object):
     filename = 'config.conf'
     VERSION="v0.9a"
+    ON = ["1","true","yes"]
 
     config = configparser.ConfigParser()
 
@@ -30,11 +31,13 @@ class Config(object):
     username = config.get('newsbot','username')
     refresh = int(config.get('newsbot','refresh'))
     maxi = int(config.get('newsbot','max'))
-    if(config.get('newsbot','broadcast') == "True"):
+#    if(config.get('newsbot','broadcast') == "True"):
+    if(config.get('newsbot','broadcast').lower() in ON):
         broadcast = True
     else:
         broadcast = False
-    if(config.get('newsbot','debug') == "True"):
+#    if(config.get('newsbot','debug') == "True"):
+    if(config.get('newsbot','debug').lower() in ON):
         debug = True
     else:
         debug = False
