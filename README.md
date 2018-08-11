@@ -15,6 +15,7 @@ hook = WEBHOOK
 channelname = newsroom
 username = newsbot
 refresh = 30
+nax = 5
 [feeds]
 feeds = https://news.ycombinator.com/rss,http://catless.ncl.ac.uk/risksrss2.xml
 ```
@@ -22,7 +23,8 @@ feeds = https://news.ycombinator.com/rss,http://catless.ncl.ac.uk/risksrss2.xml
 ## Configurables:
 
 * `broadcast` - Whether to send output
-* `SECRET_KEY` - salt used for internal article IDs (unused (yet))
+* `SECRET_KEY` - salt used for internal article IDs
+* `max` - max # of articles to scrape
 * `baseURL` - address of mattermost server, with protocol and optional :port
 * `hook` - webhook key, ex. http://mattermost.server/hook/FOOBARBAZ
 * `refresh` - number of minutes between feed updates.
