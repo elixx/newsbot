@@ -1,6 +1,8 @@
 # newsbot
 
 RSS reader bot for Mattermost (and possibly Slack).
+It will scrape RSS feeds from a config file at a defined interval, and broadcast the source and headlines to a Mattermost channel.
+Articles are written out to a data file as they are published, to avoid repeats and excessive spam when restarting the bot.
 
 Requires Python 3 w/ configparser, hashids, feedparser, and matterhook
 
