@@ -9,7 +9,7 @@ def __init__():
 def z(*text):
     s=''
     for n in text: s += str(n) + ' '
-    print('debug |\t',s)
+    print('debug | ',str(datetime.datetime.now())+'\t',s)
 
 ########### arbitrarily hashid a string with salt from config SECRET_KEY ###########
 def id_from_string(string,key):
@@ -82,7 +82,7 @@ class RSSfeed(object):
         count = 0
         d = feedparser.parse(self.source)
         for entry in d['entries']:
-            if(count > self.max): break
+            if(count >= self.max): break
             try:
                 stamp = entry['published']
             except KeyError:
