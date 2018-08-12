@@ -45,12 +45,12 @@ def run():
 
     for url in config.feedURLs:
         found = False
-        z("(main) loading RSSfeeds from feedURLs: " + url,debug=config.debug)
         for feed in allfeeds:
             if(feed.source == url):
-                found = True 
+                found = True
+                z("(main) added feed from .nbfeed: " + url,debug=config.debug)
         if(found == False):
-            z("(main) new feed detected " + url,debug=config.debug)
+            z("(main) new feed loaded from config: " + url,debug=config.debug)
             feed = RSSfeed(url=url,config=config)
             allfeeds.append(feed)
 
