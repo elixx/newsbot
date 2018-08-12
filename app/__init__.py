@@ -42,9 +42,9 @@ def run():
         file = open('.nbfeed','rb')
         allfeeds = pickle.load(file)
         file.close()
-        z("Loaded article cache from .nbfeed!")
+        if(config.debug==True): z("(main) Loaded article cache from .nbfeed!")
     except:
-        if(config.debug==True): z("No persistent data found.")
+        if(config.debug==True): z("(main) No persistent data found.")
         for url in config.feedURLs:
             if(config.debug==True): z("(main) loading RSSfeeds from feedURLs: " + url)
             feed = RSSfeed(url=url,config=config)
@@ -60,7 +60,7 @@ def run():
                 print(output)
                 if(config.broadcast == True):
                     mwh.send(output)
-                if(config.debug==True): zz("Storing state to .nbfeed")
+                if(config.debug==True): zz("(main) Storing state to .nbfeed")
                 file = open('.nbfeed','wb')
                 pickle.dump(allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
                 file.close()
