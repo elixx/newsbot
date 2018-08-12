@@ -2,3 +2,4 @@
 *.conf
 __pycache__/*
 *.bak
+.nbfeed
