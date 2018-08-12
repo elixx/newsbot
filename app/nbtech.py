@@ -34,7 +34,7 @@ def id_from_arti(title, source, key):
 class article(object):
     def __init__(self, title="none",stamp='',text='Lorem Ipsum',link='',source='',id=''):
         self.title=title
-        self.stamp=stamp
+        self.stamp=datetime.datetime.strptime(stamp,"%a, %d %b %Y %H:%M:%S %z")
         self.text=text
         self.link=link
         self.source=source
@@ -43,7 +43,7 @@ class article(object):
         if(stamp==''):
             self.stamp=datetime.datetime.now()
         else:
-            self.stamp = stamp
+            self.stamp = datetime.datetime.strptime(stamp,"%a, %d %b %Y %H:%M:%S %z")
         if(self.id == ''):
             if(self.title==''): self.title=self.link
             self.id = id_from_arti(self.title,self.source,)
@@ -51,7 +51,7 @@ class article(object):
             self.id = id
 # return article entry as markdown string
     def tostr(self):
-        dumpstr = '* `' + self.title + '` @' + str(self.stamp) + ' ' + self.link + '\n'
+        dumpstr = '* **' + self.title + '** @`' + self.stamp.strftime("%Y-%m-%d %H:%M:%S") + '` ' + self.link + '\n'
         return(dumpstr)
 
 ########### rss feed object ###########
