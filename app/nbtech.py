@@ -1,4 +1,5 @@
 import datetime
+import dateutil.parser
 import feedparser
 from hashids import Hashids
 from random import shuffle
@@ -83,7 +84,8 @@ class RSSfeed(object):
             if(count >= self.max): break
             try:
                 stamp = entry['published']
-                stamp = datetime.datetime.strptime(stamp,"%a, %d %b %Y %H:%M:%S %z")
+#                stamp = datetime.datetime.strptime(stamp,"%a, %d %b %Y %H:%M:%S %Z")
+                stamp = dateutil.parser.parse(stamp)
             except KeyError:
                 stamp = datetime.datetime.now()
                 z("\trefresh(): datetime assumed to be now.",config.debug)
