@@ -4,6 +4,7 @@ from .nbtech import z
 
 import datetime
 import sys
+import os
 import pickle
 from time import sleep
 from matterhook import Webhook
@@ -36,14 +37,22 @@ def run():
     allfeeds = []
 
     try:
+        assert(os.path.isfile('.nbfeed') == True)
         file = open('.nbfeed','rb')
         allfeeds = pickle.load(file)
         file.close()
         z("(main) Loaded article cache from .nbfeed!",debug=config.debug)
     except:
         z("(main) No persistent data found.",debug=config.debug)
-        for url in config.feedURLs:
-            z("(main) loading RSSfeeds from feedURLs: " + url,debug=config.debug)
+
+    for url in config.feedURLs:
+        found = False
+        z("(main) loading RSSfeeds from feedURLs: " + url,debug=config.debug)
+        for feed in allfeeds:
+            if(feed.source == url):
+                found = True 
+        if(found == False):
+            z("(main) new feed detected " + url,debug=config.debug)
             feed = RSSfeed(url=url,config=config)
             allfeeds.append(feed)
 

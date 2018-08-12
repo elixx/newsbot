@@ -34,16 +34,12 @@ def id_from_arti(title, source, key):
 class article(object):
     def __init__(self, title="none",stamp='',text='Lorem Ipsum',link='',source='',id=''):
         self.title=title
-        self.stamp=datetime.datetime.strptime(stamp,"%a, %d %b %Y %H:%M:%S %z")
+        self.stamp=stamp
         self.text=text
         self.link=link
         self.source=source
         self.seen=False
         self.id=id
-        if(stamp==''):
-            self.stamp=datetime.datetime.now()
-        else:
-            self.stamp = datetime.datetime.strptime(stamp,"%a, %d %b %Y %H:%M:%S %z")
         if(self.id == ''):
             if(self.title==''): self.title=self.link
             self.id = id_from_arti(self.title,self.source,)
@@ -87,8 +83,10 @@ class RSSfeed(object):
             if(count >= self.max): break
             try:
                 stamp = entry['published']
+                stamp = datetime.datetime.strptime(stamp,"%a, %d %b %Y %H:%M:%S %z")
             except KeyError:
-                stamp = ''
+                stamp = datetime.datetime.now()
+                z("\trefresh(): datetime assumed to be now.",config.debug)
             id = id_from_arti(str(entry['title']),self.source,self.config.SECRET_KEY)
             z("\trefresh() " + str(count) + ':' + id + str(stamp) + '|' + entry['title'],debug=self.config.debug)
             art = article(id=id,title=str(entry['title']), link=str(entry['link']),source=str(self.source),stamp=stamp)
