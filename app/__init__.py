@@ -19,10 +19,8 @@ hour = 60 * minute
 refresh = config.refresh * minute
 outputdelay = refresh / len(config.feedURLs) # each feed broadcast is distributed evenly across the refresh time window
 
-initstr = '## NewsBot ' + config.VERSION + ' restarting...\n'
-initstr += '(init) refresh delay is `' + str(config.refresh) + ' minutes`, output delay is `' + str(outputdelay) + ' seconds`\n'
-initstr += '(init) rss feeds in queue: `' + str(len(config.feedURLs)) + '`\n'
-initstr += '(init) newsbot initialized.\n'
+initstr = '## NewsBot ' + config.VERSION + ' starting...\n'
+initstr += 'feeds:`' + str(len(config.feedURLs)) + '` ' + 'refresh:`' + str(config.refresh) + ' min` delay:`' + str(outputdelay) + ' sec`\n'
 
 print(initstr)
 if(config.broadcast == True):

@@ -63,14 +63,12 @@ class RSSfeed(object):
             self.title = d['feed']['title']
         except KeyError:
             self.title = url
-        z("RSSfeed.config.debug is ",self.config.debug)
 # return all articles as markdown string and mark articles as seen
     def output(self):
         a = '## ' + str(self.title) + ' ##' + '\n'
         count = 1
         for arti in self.articles.values():
             if(arti.seen == False):
-#                a += '* ' + '`' + str(arti.title) + '` ' + arti.link +'\n'
                 a += arti.tostr()
                 arti.seen = True
                 count += 1
