@@ -6,10 +6,11 @@ from random import shuffle
 def __init__():
     print("nbtech.py")
 
-def z(*text):
-    s=''
-    for n in text: s += str(n) + ' '
-    print('debug | ',str(datetime.datetime.now())+'\t',s)
+def z(*text, debug=True):
+    if(debug==True):
+        s=''
+        for n in text: s += str(n) + ' '
+        print('debug | ',str(datetime.datetime.now())+'\t',s)
 
 ########### arbitrarily hashid a string with salt from config SECRET_KEY ###########
 def id_from_string(string,key):
@@ -59,13 +60,13 @@ class RSSfeed(object):
         self.articles = {}
         d = feedparser.parse(url)
         self.source = url
-        maxi=config.maxi
-        self.key=config.SECRET_KEY
+        self.max = config.maxi
+        self.config=config
         try:
             self.title = d['feed']['title']
         except KeyError:
             self.title = url
-        self.max = maxi
+        z("RSSfeed.config.debug is ",self.config.debug)
 # return all articles as markdown string and mark articles as seen
     def output(self):
         a = '## ' + str(self.title) + ' ##' + '\n'
@@ -78,7 +79,7 @@ class RSSfeed(object):
         return(a)
 # update articles[] from feedparser
     def refresh(self):
-        z("feed.refresh()",self.source)
+        z("feed.refresh(): "+self.source,debug=self.config.debug)
         count = 0
         d = feedparser.parse(self.source)
         for entry in d['entries']:
@@ -87,23 +88,23 @@ class RSSfeed(object):
                 stamp = entry['published']
             except KeyError:
                 stamp = ''
-            id = id_from_arti(str(entry['title']),self.source,self.key)
-            z("\trefresh() " + str(count) + ':' + id + str(stamp) + '|' + entry['title'])
+            id = id_from_arti(str(entry['title']),self.source,self.config.SECRET_KEY)
+            z("\trefresh() " + str(count) + ':' + id + str(stamp) + '|' + entry['title'],debug=self.config.debug)
             art = article(id=id,title=str(entry['title']), link=str(entry['link']),source=str(self.source),stamp=stamp)
             try:
                 assert(self.articles[id] is not None)
-                z("\trefresh: entry exists")
+                z("\trefresh: entry exists",debug=self.config.debug)
             except KeyError:
                 self.articles[id] = art
-                z("\trefresh: entry created",id)
+                z("\trefresh: entry created: "+id,debug=self.config.debug)
             count += 1
         self.last_updated = datetime.datetime.now()
 # count unseen articles
     def unseen(self):
         count = 0
-        z("RSSfeed.unseen() " + self.source)
+        z("RSSfeed.unseen() " + self.source,debug=self.config.debug)
         for arti in self.articles.values():
             if(arti.seen == False):
                 count += 1
-        z("Unseen articles:",count)
+        z("Unseen articles: "+str(count),debug=self.config.debug)
         return(count)

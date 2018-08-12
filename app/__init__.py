@@ -12,10 +12,6 @@ from matterhook import Webhook
 
 config = Config()
 
-# only create webhook guy if we are broadcasting live
-if(config.broadcast == True):
-    mwh = Webhook(config.baseURL, config.hook)
-
 # silly constants
 minute = 60
 hour = 60 * minute
@@ -29,6 +25,7 @@ initstr += '(newsbot init) newsbot ' + config.VERSION + ' initialized.\n'
 
 print(initstr)
 if(config.broadcast == True):
+    mwh = Webhook(config.baseURL, config.hook)
     mwh.send(initstr)
 
 # for init process debug only, uncomment:
@@ -42,30 +39,30 @@ def run():
         file = open('.nbfeed','rb')
         allfeeds = pickle.load(file)
         file.close()
-        if(config.debug==True): z("(main) Loaded article cache from .nbfeed!")
+        z("(main) Loaded article cache from .nbfeed!",debug=config.debug)
     except:
-        if(config.debug==True): z("(main) No persistent data found.")
+        z("(main) No persistent data found.",debug=config.debug)
         for url in config.feedURLs:
-            if(config.debug==True): z("(main) loading RSSfeeds from feedURLs: " + url)
+            z("(main) loading RSSfeeds from feedURLs: " + url,debug=config.debug)
             feed = RSSfeed(url=url,config=config)
             allfeeds.append(feed)
 
     while True:
         for feed in allfeeds:
-            if(config.debug==True): z("(main) refreshing " + feed.source)
+            z("(main) refreshing " + feed.source,debug=config.debug)
             feed.refresh()
             if(feed.unseen() > 0):
-                if(config.debug==True): z("(main) unseen > 0, calling output()...")
+                z("(main) unseen > 0, calling output()...",debug=config.debug)
                 output = feed.output()
                 print(output)
                 if(config.broadcast == True):
                     mwh.send(output)
-                if(config.debug==True): z("(main) Storing state to .nbfeed")
+                z("(main) Storing state to .nbfeed",debug=config.debug)
                 file = open('.nbfeed','wb')
                 pickle.dump(allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
                 file.close()
-            if(config.debug==True): z("(main) sleeping outputdelay",outputdelay,"...")
+            z("(main) sleeping outputdelay",outputdelay,"...",debug=config.debug)
             sleep(outputdelay)
-        if(config.debug==True): z("(main) sleeping refresh",refresh,"...")
+        z("(main) sleeping refresh",refresh,"...",debug=config.debug)
         sleep(refresh)
 

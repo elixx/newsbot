@@ -41,14 +41,15 @@ class Config(object):
         debug = True
     else:
         debug = False
+    print("config: config.debug is " + str(debug))
 
     feedURLstring = config.get('feeds','feeds')
     feedURLs = feedURLstring.split(',')
 
     if(feedURLs is None):
-        print('no feed URLs')
+        print('config: no feed URLs')
     else:
-        print('Configured feeds:')
+        print('config: loaded feeds:')
         for feed in feedURLs:
                 print(feed)
         print()
