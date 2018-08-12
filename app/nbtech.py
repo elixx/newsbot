@@ -51,7 +51,7 @@ class article(object):
             self.id = id
 # return article entry as markdown string
     def tostr(self):
-        dumpstr = '[' + self.source + '] "' + self.title + '" @' + str(self.stamp) + '\n' + '\t' + self.link + '\n'
+        dumpstr = '* `' + self.title + '` @' + str(self.stamp) + ' ' + self.link + '\n'
         return(dumpstr)
 
 ########### rss feed object ###########
@@ -73,7 +73,8 @@ class RSSfeed(object):
         count = 1
         for arti in self.articles.values():
             if(arti.seen == False):
-                a += '* ' + str(count) + ': ' + str(arti.title) + ' ' + arti.link +'\n'
+#                a += '* ' + '`' + str(arti.title) + '` ' + arti.link +'\n'
+                a += arti.tostr()
                 arti.seen = True
                 count += 1
         return(a)
