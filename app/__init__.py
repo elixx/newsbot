@@ -60,7 +60,7 @@ def run():
                 print(output)
                 if(config.broadcast == True):
                     mwh.send(output)
-                if(config.debug==True): zz("(main) Storing state to .nbfeed")
+                if(config.debug==True): z("(main) Storing state to .nbfeed")
                 file = open('.nbfeed','wb')
                 pickle.dump(allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
                 file.close()
