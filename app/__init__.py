@@ -4,6 +4,7 @@ from .nbtech import z
 
 import datetime
 import sys
+import pickle
 from time import sleep
 from matterhook import Webhook
 
@@ -36,10 +37,18 @@ if(config.broadcast == True):
 
 def run():
     allfeeds = []
+
     for url in config.feedURLs:
         if(config.debug==True): z("(main) loading RSSfeeds from feedURLs: " + url)
         feed = RSSfeed(url=url,config=config)
         allfeeds.append(feed)
+
+    try:
+        file = open('.nbfeed','rb')
+        allfeeds = pickle.load(file)
+        file.close()
+    except:
+        print("No persistent data found.")
 
     while True:
         for feed in allfeeds:
@@ -54,5 +63,8 @@ def run():
             if(config.debug==True): z("(main) sleeping outputdelay",outputdelay,"...")
             sleep(outputdelay)
         if(config.debug==True): z("(main) sleeping refresh",refresh,"...")
+        file = open('.nbfeed','wb')
+        pickle.save(allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
+        file.close()
         sleep(refresh)
 
