@@ -82,7 +82,7 @@ class RSSfeed(object):
         count = 0
         d = feedparser.parse(self.source)
         for entry in d['entries']:
-            if(count > self.max): break
+            if(count >= self.max): break
             try:
                 stamp = entry['published']
             except KeyError:
