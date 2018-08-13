@@ -73,6 +73,4 @@ def run():
                 file.close()
             z("(main) sleeping outputdelay",outputdelay,"...",debug=config.debug)
             sleep(outputdelay)
-        z("(main) sleeping refresh",refresh,"...",debug=config.debug)
-        sleep(refresh)
 
