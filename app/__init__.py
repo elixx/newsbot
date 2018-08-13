@@ -43,9 +43,12 @@ def run():
             allfeeds.append(feed)
 
     for feed in allfeeds:
+        if(feed.source not in [url for url in config.feedURLs]):
+            z("(main) deleting " + feed.source + "from allfeeds.")
+            del feed
+            continue
         feed.config = config
         feed.max = config.maxi
-
 
     initstr = '## NewsBot ' + config.VERSION + ' starting...\n'
     initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(config.feedURLs)) + '` ' + 'refresh:`' + str(config.refresh) + ' min` delay:`' + str(outputdelay) + ' sec` max:`' + str(config.maxi) + '`\n'
