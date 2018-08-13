@@ -42,6 +42,10 @@ def run():
             feed = RSSfeed(url=url,config=config)
             allfeeds.append(feed)
 
+    for feed in allfeeds:
+        feed.config = config
+        feed.max = config.maxi
+
 
     initstr = '## NewsBot ' + config.VERSION + ' starting...\n'
     initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(config.feedURLs)) + '` ' + 'refresh:`' + str(config.refresh) + ' min` delay:`' + str(outputdelay) + ' sec`\n'
