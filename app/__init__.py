@@ -9,30 +9,16 @@ import pickle
 from time import sleep
 from matterhook import Webhook
 
-######################## init ########################
-
-config = Config()
-
-# silly constants
-minute = 60
-hour = 60 * minute
-refresh = config.refresh * minute
-outputdelay = refresh / len(config.feedURLs) # each feed broadcast is distributed evenly across the refresh time window
-
-initstr = '## NewsBot ' + config.VERSION + ' starting...\n'
-initstr += 'feeds:`' + str(len(config.feedURLs)) + '` ' + 'refresh:`' + str(config.refresh) + ' min` delay:`' + str(outputdelay) + ' sec`\n'
-
-print(initstr)
-if(config.broadcast == True):
-    mwh = Webhook(config.baseURL, config.hook)
-    mwh.send(initstr)
-
-# for init process debug only, uncomment:
-# raise BaseException('InitCompleted') 
-######################## main ########################
-
 def run():
+    ######################## init ########################
     allfeeds = []
+    config = Config()
+
+    # silly constants
+    minute = 60
+    hour = 60 * minute
+    refresh = config.refresh * minute
+    outputdelay = refresh / len(config.feedURLs) # each feed broadcast is distributed evenly across the refresh time window
 
     try:
         assert(os.path.isfile('.nbfeed') == True)
@@ -40,8 +26,10 @@ def run():
         allfeeds = pickle.load(file)
         file.close()
         z("(main) Loaded article cache from .nbfeed!",debug=config.debug)
+        cacheloaded=True
     except:
         z("(main) No persistent data found.",debug=config.debug)
+        cacheloaded=False
 
     for url in config.feedURLs:
         found = False
@@ -54,6 +42,19 @@ def run():
             feed = RSSfeed(url=url,config=config)
             allfeeds.append(feed)
 
+
+    initstr = '## NewsBot ' + config.VERSION + ' starting...\n'
+    initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(config.feedURLs)) + '` ' + 'refresh:`' + str(config.refresh) + ' min` delay:`' + str(outputdelay) + ' sec`\n'
+
+    print(initstr)
+    if(config.broadcast == True):
+        mwh = Webhook(config.baseURL, config.hook)
+        mwh.send(initstr)
+
+# for init process debug only, uncomment:
+    # raise BaseException('InitCompleted') 
+
+    ######################## main ########################
     while True:
         count = 0
         for feed in allfeeds:
