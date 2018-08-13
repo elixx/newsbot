@@ -65,7 +65,7 @@ class RSSfeed(object):
             self.title = url
 # return all articles as markdown string and mark articles as seen
     def output(self):
-        a = '## ' + str(self.title) + ' ##' + '\n'
+        a = '### ' + str(self.title) + ' ###' + '\n'
         count = 1
         for arti in self.articles.values():
             if(arti.seen == False):
