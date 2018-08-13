@@ -48,7 +48,7 @@ def run():
 
 
     initstr = '## NewsBot ' + config.VERSION + ' starting...\n'
-    initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(config.feedURLs)) + '` ' + 'refresh:`' + str(config.refresh) + ' min` delay:`' + str(outputdelay) + ' sec`\n'
+    initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(config.feedURLs)) + '` ' + 'refresh:`' + str(config.refresh) + ' min` delay:`' + str(outputdelay) + ' sec` max:`' + str(config.maxi) + '`\n'
 
     print(initstr)
     if(config.broadcast == True):
