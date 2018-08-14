@@ -11,7 +11,7 @@ from matterhook import Webhook
 
 def run():
     ######################## init ########################
-    allfeeds = []
+    allfeeds = {}
     config = Config()
 
     # silly constants
@@ -33,22 +33,25 @@ def run():
 
     for url in config.feedURLs:
         found = False
-        for feed in allfeeds:
+        for feed in allfeeds.values():
             if(feed.source == url):
                 found = True
                 z("(main) added feed from .nbfeed: " + url,debug=config.debug)
         if(found == False):
             z("(main) new feed loaded from config: " + url,debug=config.debug)
-            feed = RSSfeed(url=url,config=config)
-            allfeeds.append(feed)
+            allfeeds[url] = RSSfeed(url=url,config=config)
 
-    for feed in allfeeds:
+    rmlist = []
+    for feed in allfeeds.values():
         if(feed.source not in [url for url in config.feedURLs]):
-            z("(main) deleting " + feed.source + " from allfeeds.",debug=config.debug)
-            allfeeds.remove(feed)
+            z("(main) going to rm " + feed.source + " from allfeeds.",debug=config.debug)
+            rmlist.append(feed.source)
             continue
         feed.config = config
         feed.max = config.maxi
+    for rm in rmlist:
+        z('(main) del ' + rm,debug=config.debug) 
+        del allfeeds[rm]
 
     file = open('.nbfeed','wb')
     pickle.dump(allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
@@ -68,7 +71,7 @@ def run():
     ######################## main ########################
     while True:
         count = 0
-        for feed in allfeeds:
+        for feed in allfeeds.values():
             count += 1
             z("(main) refreshing feed " + str(count) + ' - ' + feed.source,debug=config.debug)
             feed.refresh()

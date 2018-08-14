@@ -5,7 +5,7 @@ import configparser
 
 class Config(object):
     filename = 'config.conf'
-    VERSION="v1.0"
+    VERSION="v1.1"
     ON = ["1","true","yes"]
 
     config = configparser.ConfigParser()
