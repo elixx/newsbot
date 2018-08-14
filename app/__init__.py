@@ -66,7 +66,7 @@ def run():
         mwh.send(initstr)
 
 # for init process debug only, uncomment:
-    # raise BaseException('InitCompleted') 
+    #raise BaseException('InitCompleted') 
 
     ######################## main ########################
     while True:
@@ -77,7 +77,7 @@ def run():
             feed.refresh()
             if(feed.unseen() > 0):
                 z("(main) unseen > 0, calling output()...",debug=config.debug)
-                output = feed.output()
+                output = count + ':' + feed.output()
                 print(output)
                 if(config.broadcast == True):
                     mwh.send(output)
