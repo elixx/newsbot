@@ -73,7 +73,7 @@ class RSSfeed(object):
                 arti.seen = True
                 count += 1
         return(a)
-# update articles[] from feedparser
+# update articles from feedparser
     def refresh(self):
         z("feed.refresh(): "+self.source,debug=self.config.debug)
         count = 0
@@ -88,14 +88,14 @@ class RSSfeed(object):
                 stamp = datetime.datetime.now()
                 z("\trefresh(): datetime assumed to be now.",debug=self.config.debug)
             id = id_from_arti(str(entry['title']),self.source,self.config.SECRET_KEY)
-            z("\trefresh() " + str(count) + ':' + id + str(stamp) + '|' + entry['title'],debug=self.config.debug)
             art = article(id=id,title=str(entry['title']), link=str(entry['link']),source=str(self.source),stamp=stamp)
             try:
                 assert(self.articles[id] is not None)
-                z("\trefresh: entry exists",debug=self.config.debug)
+                newentry = False
             except KeyError:
                 self.articles[id] = art
-                z("\trefresh: entry created: "+id,debug=self.config.debug)
+                newentry = True
+            z("\trefresh() " + str(count) + ' new:' + str(newentry) + ' ' + id + str(stamp) + ' ' + entry['title'],debug=self.config.debug)
             count += 1
         self.last_updated = datetime.datetime.now()
 # count unseen articles
