@@ -86,7 +86,7 @@ class RSSfeed(object):
                 stamp = dateutil.parser.parse(stamp)
             except (KeyError, ValueError):
                 stamp = datetime.datetime.now()
-                z("\trefresh(): datetime assumed to be now.",self.config.debug)
+                z("\trefresh(): datetime assumed to be now.",debug=self.config.debug)
             id = id_from_arti(str(entry['title']),self.source,self.config.SECRET_KEY)
             z("\trefresh() " + str(count) + ':' + id + str(stamp) + '|' + entry['title'],debug=self.config.debug)
             art = article(id=id,title=str(entry['title']), link=str(entry['link']),source=str(self.source),stamp=stamp)
