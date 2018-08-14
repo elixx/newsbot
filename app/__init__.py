@@ -77,7 +77,7 @@ def run():
             feed.refresh()
             if(feed.unseen() > 0):
                 z("(main) unseen > 0, calling output()...",debug=config.debug)
-                output = str(count) + ':' + feed.output()
+                output = feed.output()
                 print(output)
                 if(config.broadcast == True):
                     mwh.send(output)
