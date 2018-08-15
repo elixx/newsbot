@@ -9,17 +9,15 @@ import pickle
 from time import sleep
 from matterhook import Webhook
 
-def run():
-    ######################## init ########################
-    allfeeds = {}
-    config = Config()
+allfeeds = {}
+config = Config()
+minute = 60
+hour = 60 * minute
 
-    # silly constants
-    minute = 60
-    hour = 60 * minute
+def conf(signum=0, frame=0):
+    config = Config()
     refresh = config.refresh * minute
     outputdelay = refresh / len(config.feedURLs) # each feed broadcast is distributed evenly across the refresh time window
-
     try:
         assert(os.path.isfile('.nbfeed') == True)
         file = open('.nbfeed','rb')
@@ -65,10 +63,7 @@ def run():
         mwh = Webhook(config.baseURL, config.hook)
         mwh.send(initstr)
 
-# for init process debug only, uncomment:
-    #raise BaseException('InitCompleted') 
-
-    ######################## main ########################
+def run():
     while True:
         count = 0
         for feed in allfeeds.values():
@@ -87,4 +82,3 @@ def run():
                 file.close()
             z("(main) sleeping outputdelay",outputdelay,"...",debug=config.debug)
             sleep(outputdelay)
-
