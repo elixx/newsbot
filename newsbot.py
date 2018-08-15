@@ -6,5 +6,5 @@ from app import *
 signal.signal(signal.SIGHUP, conf)
 
 if __name__ == '__main__':
-  conf()
+  conf(firstrun=True)
   run()

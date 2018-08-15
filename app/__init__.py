@@ -14,7 +14,7 @@ config = Config()
 minute = 60
 hour = 60 * minute
 
-def conf(signum=0, frame=0):
+def conf(signum=0, frame=0, firstrun=False):
     config = Config()
     refresh = config.refresh * minute
     outputdelay = refresh / len(config.feedURLs) # each feed broadcast is distributed evenly across the refresh time window
@@ -59,9 +59,10 @@ def conf(signum=0, frame=0):
     initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(config.feedURLs)) + '` ' + 'refresh:`' + str(config.refresh) + ' min` delay:`' + str(outputdelay) + ' sec` max:`' + str(config.maxi) + '`\n'
 
     print(initstr)
-    if(config.broadcast == True):
-        mwh = Webhook(config.baseURL, config.hook)
-        mwh.send(initstr)
+    if(firstrun==True):
+        if(config.broadcast == True):
+            mwh = Webhook(config.baseURL, config.hook)
+            mwh.send(initstr)
 
 def run():
     while True:
