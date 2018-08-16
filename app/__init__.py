@@ -10,25 +10,10 @@ from time import sleep
 from matterhook import Webhook
 
 class NewsBot(object):
-    def __init__(self):
-        self.config = Config()
+    def __init__(self,filename='config.conf'):
+        self.config = Config(filename)
         self.allfeeds = {}
         self.conf()
-
-def conf(signum=0, frame=0, firstrun=False):
-    config = Config()
-    refresh = config.refresh * minute
-    outputdelay = refresh / len(config.feedURLs) # each feed broadcast is distributed evenly across the refresh time window
-    try:
-        assert(os.path.isfile('.nbfeed') == True)
-        file = open('.nbfeed','rb')
-        allfeeds = pickle.load(file)
-        file.close()
-        z("(main) Loaded article cache from .nbfeed!",debug=config.debug)
-        cacheloaded=True
-    except:
-        z("(main) No persistent data found.",debug=config.debug)
-        cacheloaded=False
 
     def conf(self):
         self.allfeeds = {}
@@ -72,13 +57,28 @@ def conf(signum=0, frame=0, firstrun=False):
         pickle.dump(self.allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
         file.close()
 
-    print(initstr)
-    if(firstrun==True):
-        if(config.broadcast == True):
-            mwh = Webhook(config.baseURL, config.hook)
-            mwh.send(initstr)
-
-        print(initstr)
+        initstr = '## NewsBot ' + self.config.VERSION + ' starting...\n'
+        initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
+        initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay) + ' sec` max:`' + str(self.config.maxi) + '`\n'
         if(self.config.broadcast == True):
-            mwh = Webhook(self.config.baseURL, self.config.hook)
-            mwh.send(initstr)
+            self.mwh = Webhook(self.config.baseURL, self.config.hook)
+            self.mwh.send(initstr)
+
+    def run(self):
+        while True:
+            count = 0
+            for feed in self.allfeeds.values():
+                count += 1
+                z("(main) refreshing feed " + str(count) + ' - ' + feed.source,debug=self.config.debug)
+                feed.refresh()
+                if(feed.unseen() > 0):
+                    z("(main) unseen > 0, calling output()...",debug=self.config.debug)
+                    output = feed.output()
+                    print(output)
+                    if self.config.broadcast: self.mwh.send(output)
+                    z("(main) Storing state to .nbfeed",debug=self.config.debug)
+                    file = open('.nbfeed','wb')
+                    pickle.dump(self.allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
+                    file.close()
+                z("(main) sleeping outputdelay",self.config.outputdelay,"...",debug=self.config.debug)
+                sleep(self.config.outputdelay*60)

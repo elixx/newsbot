@@ -3,5 +3,5 @@
 from app import *
 
 if __name__ == '__main__':
-  conf(firstrun=True)
-  run()
+    nb = NewsBot('config.conf')
+    nb.run()
