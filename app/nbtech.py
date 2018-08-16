@@ -11,7 +11,7 @@ def z(*text, debug=True):
     if(debug==True):
         s=''
         for n in text: s += str(n) + ' '
-        print('debug | ',str(datetime.datetime.now())+'\t',s)
+        print('debug | ',str(datetime.datetime.now())+'  ',s)
 
 ########### arbitrarily hashid a string with salt from config SECRET_KEY ###########
 def id_from_string(string,key):
@@ -82,7 +82,6 @@ class RSSfeed(object):
             if(count >= self.max): break
             try:
                 stamp = entry['published']
-#                stamp = datetime.datetime.strptime(stamp,"%a, %d %b %Y %H:%M:%S %Z")
                 stamp = dateutil.parser.parse(stamp)
             except (KeyError, ValueError):
                 stamp = datetime.datetime.now()

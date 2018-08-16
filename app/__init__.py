@@ -9,10 +9,11 @@ import pickle
 from time import sleep
 from matterhook import Webhook
 
-allfeeds = {}
-config = Config()
-minute = 60
-hour = 60 * minute
+class NewsBot(object):
+    def __init__(self):
+        self.config = Config()
+        self.allfeeds = {}
+        self.conf()
 
 def conf(signum=0, frame=0, firstrun=False):
     config = Config()
@@ -29,34 +30,47 @@ def conf(signum=0, frame=0, firstrun=False):
         z("(main) No persistent data found.",debug=config.debug)
         cacheloaded=False
 
-    for url in config.feedURLs:
-        found = False
-        for feed in allfeeds.values():
-            if(feed.source == url):
-                found = True
-                z("(main) added feed from .nbfeed: " + url,debug=config.debug)
-        if(found == False):
-            z("(main) new feed loaded from config: " + url,debug=config.debug)
-            allfeeds[url] = RSSfeed(url=url,config=config)
+    def conf(self):
+        self.allfeeds = {}
+        self.config = Config()
+        self.config.reload()
+        self.config.outputdelay = self.config.refresh / len(self.config.feedURLs) # each feed broadcast is distributed evenly across the refresh time window
+        try:
+            assert(os.path.isfile('.nbfeed') == True)
+            file = open('.nbfeed','rb')
+            self.allfeeds = pickle.load(file)
+            file.close()
+            z("(NewsBot) conf(): Loaded article cache from .nbfeed!",debug=self.config.debug)
+            cacheloaded=True
+        except:
+            z("(NewsBot) conf():  No persistent data found.",debug=self.config.debug)
+            cacheloaded=False
 
-    rmlist = []
-    for feed in allfeeds.values():
-        if(feed.source not in [url for url in config.feedURLs]):
-            z("(main) going to rm " + feed.source + " from allfeeds.",debug=config.debug)
-            rmlist.append(feed.source)
-            continue
-        feed.config = config
-        feed.max = config.maxi
-    for rm in rmlist:
-        z('(main) del ' + rm,debug=config.debug) 
-        del allfeeds[rm]
+        for url in self.config.feedURLs:
+            found = False
+            for feed in self.allfeeds.values():
+                if(feed.source == url):
+                    found = True
+                    z("(NewsBot) conf(): added feed from .nbfeed: " + url,debug=self.config.debug)
+            if(found == False):
+                z("(NewsBot) conf(): new feed loaded from config: " + url,debug=self.config.debug)
+                self.allfeeds[url] = RSSfeed(url=url,config=self.config)
 
-    file = open('.nbfeed','wb')
-    pickle.dump(allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
-    file.close()
+        rmlist = []
+        for feed in self.allfeeds.values():
+            if(feed.source not in [url for url in self.config.feedURLs]):
+                z("(NewsBot) conf(): going to rm " + feed.source + " from allfeeds.",debug=self.config.debug)
+                rmlist.append(feed.source)
+                continue
+            feed.config = self.config
+            feed.max = self.config.maxi
+        for rm in rmlist:
+            z('(NewsBot) conf():  del ' + rm,debug=self.config.debug) 
+            del self.allfeeds[rm]
 
-    initstr = '## NewsBot ' + config.VERSION + ' starting...\n'
-    initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(config.feedURLs)) + '` ' + 'refresh:`' + str(config.refresh) + ' min` delay:`' + str(outputdelay) + ' sec` max:`' + str(config.maxi) + '`\n'
+        file = open('.nbfeed','wb')
+        pickle.dump(self.allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
+        file.close()
 
     print(initstr)
     if(firstrun==True):
@@ -64,22 +78,7 @@ def conf(signum=0, frame=0, firstrun=False):
             mwh = Webhook(config.baseURL, config.hook)
             mwh.send(initstr)
 
-def run():
-    while True:
-        count = 0
-        for feed in allfeeds.values():
-            count += 1
-            z("(main) refreshing feed " + str(count) + ' - ' + feed.source,debug=config.debug)
-            feed.refresh()
-            if(feed.unseen() > 0):
-                z("(main) unseen > 0, calling output()...",debug=config.debug)
-                output = feed.output()
-                print(output)
-                if(config.broadcast == True):
-                    mwh.send(output)
-                z("(main) Storing state to .nbfeed",debug=config.debug)
-                file = open('.nbfeed','wb')
-                pickle.dump(allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
-                file.close()
-            z("(main) sleeping outputdelay",outputdelay,"...",debug=config.debug)
-            sleep(outputdelay)
+        print(initstr)
+        if(self.config.broadcast == True):
+            mwh = Webhook(self.config.baseURL, self.config.hook)
+            mwh.send(initstr)
