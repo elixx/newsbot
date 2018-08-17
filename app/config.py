@@ -30,8 +30,8 @@ class Config(object):
             print("reload continuing")
         except:
             print("reload failed!")
-            raise BaseException("RefreashFailed")
             print('punt!!')
+            exit()
 
         feedURLstring = self.cp.get('feeds','feeds')
         self.feedURLs = feedURLstring.split(',')

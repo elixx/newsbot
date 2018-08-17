@@ -6,18 +6,19 @@ import datetime
 import sys
 import os
 import pickle
+import signal
 from time import sleep
 from matterhook import Webhook
 
 class NewsBot(object):
     def __init__(self,filename='config.conf'):
+        signal.signal(signal.SIGINT, self.signal_handler)
         self.config = Config(filename)
-        self.allfeeds = {}
         self.conf()
+        self.kill = False
 
     def conf(self):
         self.allfeeds = {}
-        self.config = Config()
         self.config.reload()
         self.config.outputdelay = self.config.refresh*60 / len(self.config.feedURLs) # each feed broadcast is distributed evenly across the refresh time window
         try:
@@ -71,6 +72,7 @@ class NewsBot(object):
                 count += 1
                 z("(run) refreshing feed " + str(count) + ' - ' + feed.source,debug=self.config.debug)
                 feed.refresh()
+                self.kill = False
                 if(feed.unseen() > 0):
                     z("(run) unseen > 0, calling output()...",debug=self.config.debug)
                     output = feed.output()
@@ -82,3 +84,12 @@ class NewsBot(object):
                     file.close()
                 z("(run) sleeping outputdelay",self.config.outputdelay,"...",debug=self.config.debug)
                 sleep(self.config.outputdelay)
+
+    def signal_handler(self,sig=0,frame=0):
+        if(self.kill):
+            exit()
+        else:
+            print("SIGHUP!")
+            self.config.reload()
+            self.kill=True
+            self.run()
