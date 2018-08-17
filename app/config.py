@@ -4,7 +4,7 @@ import configparser
 
 class Config(object):
     def __init__(self, filename='config.conf'):
-        self.VERSION="v1.2"
+        self.VERSION="v1.21"
         self.ON = ["1","true","yes"]
         self.cp = configparser.ConfigParser()
         try:
@@ -46,7 +46,7 @@ class Config(object):
         self.broadcast = True if self.cp.get('newsbot','broadcast').lower() in self.ON else False
         self.debug = True if self.cp.get('newsbot','debug').lower() in self.ON else False
 
-        self.outputdelay = (self.refresh / len(self.feedURLs))
+        self.outputdelay = (self.refresh*60 / len(self.feedURLs))
 
         if(self.feedURLs is None):
             print('config: no feed URLs')

@@ -19,7 +19,7 @@ class NewsBot(object):
         self.allfeeds = {}
         self.config = Config()
         self.config.reload()
-        self.config.outputdelay = self.config.refresh / len(self.config.feedURLs) # each feed broadcast is distributed evenly across the refresh time window
+        self.config.outputdelay = self.config.refresh*60 / len(self.config.feedURLs) # each feed broadcast is distributed evenly across the refresh time window
         try:
             assert(os.path.isfile('.nbfeed') == True)
             file = open('.nbfeed','rb')
@@ -59,7 +59,7 @@ class NewsBot(object):
 
         initstr = '## NewsBot ' + self.config.VERSION + ' starting...\n'
         initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
-        initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay) + ' min` max:`' + str(self.config.maxi) + '`\n'
+        initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay/60) + ' min` max:`' + str(self.config.maxi) + '`\n'
         if(self.config.broadcast == True):
             self.mwh = Webhook(self.config.baseURL, self.config.hook)
             self.mwh.send(initstr)
