@@ -85,7 +85,7 @@ class RSSfeed(object):
                 stamp = dateutil.parser.parse(stamp)
             except (KeyError, ValueError):
                 stamp = datetime.datetime.now()
-                z("  refresh(): datetime assumed to be now.",debug=self.config.debug)
+                z("(RSSfeed)    refresh(): datetime assumed to be now.",debug=self.config.debug)
             id = id_from_arti(str(entry['title']),self.source,self.config.SECRET_KEY)
             art = article(id=id,title=str(entry['title']), link=str(entry['link']),source=str(self.source),stamp=stamp)
             try:
@@ -94,15 +94,14 @@ class RSSfeed(object):
             except KeyError:
                 self.articles[id] = art
                 newentry = True
-            z("  refresh() " + str(count) + ' new:' + str(newentry) + ' ' + id + str(stamp) + ' ' + entry['title'][:12],debug=self.config.debug)
+            z("(RSSfeed)  refresh() " + str(count) + ' new:' + str(newentry) + ' ' + id + '@' + str(stamp) + ' ' + entry['title'][:16],debug=self.config.debug)
             count += 1
         self.last_updated = datetime.datetime.now()
 # count unseen articles
     def unseen(self):
         count = 0
-        z("RSSfeed.unseen() " + self.source,debug=self.config.debug)
         for arti in self.articles.values():
             if(arti.seen == False):
                 count += 1
-        z("Unseen articles: "+str(count),debug=self.config.debug)
+        z("(RSSfeed) " + self.source + " Unseen articles: "+str(count),debug=self.config.debug)
         return(count)

@@ -59,7 +59,7 @@ class NewsBot(object):
 
         initstr = '## NewsBot ' + self.config.VERSION + ' starting...\n'
         initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
-        initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay) + ' sec` max:`' + str(self.config.maxi) + '`\n'
+        initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay) + ' min` max:`' + str(self.config.maxi) + '`\n'
         if(self.config.broadcast == True):
             self.mwh = Webhook(self.config.baseURL, self.config.hook)
             self.mwh.send(initstr)
@@ -69,16 +69,16 @@ class NewsBot(object):
             count = 0
             for feed in self.allfeeds.values():
                 count += 1
-                z("(main) refreshing feed " + str(count) + ' - ' + feed.source,debug=self.config.debug)
+                z("(run) refreshing feed " + str(count) + ' - ' + feed.source,debug=self.config.debug)
                 feed.refresh()
                 if(feed.unseen() > 0):
-                    z("(main) unseen > 0, calling output()...",debug=self.config.debug)
+                    z("(run) unseen > 0, calling output()...",debug=self.config.debug)
                     output = feed.output()
                     print(output)
                     if self.config.broadcast: self.mwh.send(output)
-                    z("(main) Storing state to .nbfeed",debug=self.config.debug)
+                    z("(run) Storing state to .nbfeed",debug=self.config.debug)
                     file = open('.nbfeed','wb')
                     pickle.dump(self.allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
                     file.close()
-                z("(main) sleeping outputdelay",self.config.outputdelay,"...",debug=self.config.debug)
-                sleep(self.config.outputdelay*60)
+                z("(run) sleeping outputdelay",self.config.outputdelay,"...",debug=self.config.debug)
+                sleep(self.config.outputdelay)
