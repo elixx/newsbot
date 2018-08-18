@@ -81,7 +81,7 @@ class NewsBot(object):
             count = 0
             for feed in self.allfeeds.values():
                 count += 1
-                z("(run) refreshing feed " + str(count) + ' - ' + feed.source,debug=self.config.debug)
+                z("(run) refreshing feed " + str(count) + ' of ' + str(len(self.allfeeds)) + ' - ' + feed.source,debug=self.config.debug)
                 feed.refresh()
                 self.kill = False
                 if(feed.unseen() > 0):
