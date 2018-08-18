@@ -81,7 +81,6 @@ class RSSfeed(object):
 
     # update articles from feedparser
     def refresh(self):
-        z("feed.refresh(): "+self.source,debug=self.config.debug)
         count = 0
         d = feedparser.parse(self.source)
         for entry in d['entries']:

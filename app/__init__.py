@@ -85,7 +85,6 @@ class NewsBot(object):
                 feed.refresh()
                 self.kill = False
                 if(feed.unseen() > 0):
-                    z("(run) unseen > 0, calling output()...",debug=self.config.debug)
                     output = feed.output()
                     print(output)
                     if self.config.broadcast: self.mwh.send(output)
