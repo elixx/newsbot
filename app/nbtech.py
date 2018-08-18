@@ -24,16 +24,16 @@ def id_from_string(string,key):
     return(hashids.encode_hex(tmp))
 
 ########### take article data and arbitrarily generate hashid ###########
-def id_from_arti(title, source, key):
+def id_from_arti(title, salt, key):
     if(len(title)<16):
         title += (16-len(title))*"."
-    if(len(source)<9):
-        source += (9-len(title))*"."
-    return(id_from_string(title[-16]+source[1:9],key))
+    if(len(salt)<12):
+        salt += (12-len(salt))*"."
+    return(id_from_string(title[-16]+salt[6:18],key))
 
 ########### article object from rss feed ###########
 class article(object):
-    def __init__(self, title="none",stamp='',text='Lorem Ipsum',link='',source='',id=''):
+    def __init__(self, title="none",stamp='',text='Lorem Ipsum',link='',source='',id='',key='DEADBEEFF00D'):
         self.title=title
         self.stamp=stamp
         self.text=text
@@ -43,7 +43,7 @@ class article(object):
         self.id=id
         if(self.id == ''):
             if(self.title==''): self.title=self.link
-            self.id = id_from_arti(self.title,self.source,)
+            self.id = id_from_arti(self.title,str(self.stamp),key)
         else:
             self.id = id
 # return article entry as markdown string

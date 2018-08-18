@@ -4,7 +4,7 @@ import configparser
 
 class Config(object):
     def __init__(self, filename='config.conf'):
-        self.VERSION="v1.21"
+        self.VERSION="v1.22a"
         self.ON = ["1","true","yes"]
         self.cp = configparser.ConfigParser()
         try:
