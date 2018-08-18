@@ -26,11 +26,11 @@ def id_from_string(string,key):
 
 ########### take article data and arbitrarily generate hashid ###########
 def id_from_arti(title, salt, key):
-    if(len(title)<16):
-        title += (16-len(title))*"."
+    if(len(title)<32):
+        title += (32-len(title))*"."
     if(len(salt)<12):
         salt += (12-len(salt))*"."
-    return(id_from_string(title[:16]+salt[6:19],key))
+    return(id_from_string(title[:32]+salt[6:19],key))
 
 
 ########### article object to be retrieved rss feed ###########
