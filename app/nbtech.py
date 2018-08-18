@@ -7,6 +7,7 @@ from random import shuffle
 def __init__():
     print("nbtech.py")
 
+########### this is how we do debug output ###########
 def z(*text, debug=True):
     if(debug==True):
         s=''
@@ -31,7 +32,8 @@ def id_from_arti(title, salt, key):
         salt += (12-len(salt))*"."
     return(id_from_string(title[-16]+salt[6:18],key))
 
-########### article object from rss feed ###########
+
+########### article object to be retrieved rss feed ###########
 class article(object):
     def __init__(self, title="none",stamp='',text='Lorem Ipsum',link='',source='',id='',key='DEADBEEFF00D'):
         self.title=title
@@ -46,10 +48,12 @@ class article(object):
             self.id = id_from_arti(self.title,str(self.stamp),key)
         else:
             self.id = id
-# return article entry as markdown string
+
+    # return article entry as markdown string
     def tostr(self):
         dumpstr = '* **' + self.title + '** @`' + self.stamp.strftime("%Y-%m-%d %H:%M:%S") + '` ' + self.link + '\n'
         return(dumpstr)
+
 
 ########### rss feed object ###########
 class RSSfeed(object):
@@ -63,7 +67,8 @@ class RSSfeed(object):
             self.title = d['feed']['title']
         except KeyError:
             self.title = url
-# return all articles as markdown string and mark articles as seen
+
+    # return all articles as markdown string and mark articles as seen
     def output(self):
         a = '### ' + str(self.title) + ' ###' + '\n'
         count = 1
@@ -73,7 +78,8 @@ class RSSfeed(object):
                 arti.seen = True
                 count += 1
         return(a)
-# update articles from feedparser
+
+    # update articles from feedparser
     def refresh(self):
         z("feed.refresh(): "+self.source,debug=self.config.debug)
         count = 0
@@ -97,7 +103,8 @@ class RSSfeed(object):
             z("(RSSfeed)  refresh() " + str(count) + ' new:' + str(newentry) + ' ' + id + '@' + str(stamp) + ' ' + entry['title'][:16],debug=self.config.debug)
             count += 1
         self.last_updated = datetime.datetime.now()
-# count unseen articles
+
+    # count unseen articles
     def unseen(self):
         count = 0
         for arti in self.articles.values():

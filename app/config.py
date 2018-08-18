@@ -29,7 +29,7 @@ class Config(object):
             self.cp.read(filename)
             print("reload continuing")
         except:
-            print("reload failed!")
+            print("reload config file failed!")
             print('punt!!')
             exit()
 

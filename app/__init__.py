@@ -15,12 +15,15 @@ class NewsBot(object):
         signal.signal(signal.SIGINT, self.signal_handler)
         self.config = Config(filename)
         self.conf()
-        self.kill = False
+        self.kill = False # for SIGHUP handler to tell whether we are actially trying to exit.
 
+    ## reload config object from file and propgate settings into allfeeds{}.
     def conf(self):
         self.allfeeds = {}
         self.config.reload()
         self.config.outputdelay = self.config.refresh*60 / len(self.config.feedURLs) # each feed broadcast is distributed evenly across the refresh time window
+
+        # config has been [re]loaded. check for and load .nbfeed cache
         try:
             assert(os.path.isfile('.nbfeed') == True)
             file = open('.nbfeed','rb')
@@ -32,6 +35,7 @@ class NewsBot(object):
             z("(NewsBot) conf():  No persistent data found.",debug=self.config.debug)
             cacheloaded=False
 
+        # add all feeds that are listed in config; pickle may have already loaded .nbfeed into allfeeds.
         for url in self.config.feedURLs:
             found = False
             for feed in self.allfeeds.values():
@@ -42,6 +46,7 @@ class NewsBot(object):
                 z("(NewsBot) conf(): new feed loaded from config: " + url,debug=self.config.debug)
                 self.allfeeds[url] = RSSfeed(url=url,config=self.config)
 
+        # remove any feeds not present in config file's feeds
         rmlist = []
         for feed in self.allfeeds.values():
             if(feed.source not in [url for url in self.config.feedURLs]):
@@ -54,10 +59,12 @@ class NewsBot(object):
             z('(NewsBot) conf():  del ' + rm,debug=self.config.debug) 
             del self.allfeeds[rm]
 
+        # write out allfeeds to .nbfeed, to reflect any cleanup that may have occurred.
         file = open('.nbfeed','wb')
         pickle.dump(self.allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
         file.close()
 
+        # announce startup
         initstr = '## NewsBot ' + self.config.VERSION + ' starting...\n'
         initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
         initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay/60) + ' min` max:`' + str(self.config.maxi) + '`\n'
@@ -65,6 +72,8 @@ class NewsBot(object):
             self.mwh = Webhook(self.config.baseURL, self.config.hook)
             self.mwh.send(initstr)
 
+
+    ## tight loop through allfeeds{} - refresh and output the feeds
     def run(self):
         while True:
             count = 0
@@ -85,6 +94,7 @@ class NewsBot(object):
                 z("(run) sleeping outputdelay",self.config.outputdelay,"...",debug=self.config.debug)
                 sleep(self.config.outputdelay)
 
+    ## handler for when a SIGHUP (or ctrl-c) is received
     def signal_handler(self,sig=0,frame=0):
         if(self.kill):
             exit()
