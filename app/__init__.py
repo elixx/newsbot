@@ -90,6 +90,6 @@ class NewsBot(object):
             exit()
         else:
             print("SIGHUP!")
-            self.config.reload()
+            self.conf()
             self.kill=True
             self.run()
