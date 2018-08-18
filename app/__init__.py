@@ -14,6 +14,7 @@ class NewsBot(object):
     def __init__(self,filename='config.conf'):
         signal.signal(signal.SIGINT, self.signal_handler)
         self.config = Config(filename)
+        self.firstrun = True
         self.conf()
         self.kill = False # for SIGHUP handler to tell whether we are actially trying to exit.
 
@@ -65,10 +66,11 @@ class NewsBot(object):
         file.close()
 
         # announce startup
-        initstr = '## NewsBot ' + self.config.VERSION + ' starting...\n'
+        initstr = '### NewsBot ' + self.config.VERSION + ' starting...\n'
         initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
         initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay/60) + ' min` max:`' + str(self.config.maxi) + '`\n'
-        if(self.config.broadcast == True):
+        if(self.config.broadcast == True and self.firstrun == True):
+            self.firstrun = False
             self.mwh = Webhook(self.config.baseURL, self.config.hook)
             self.mwh.send(initstr)
 

@@ -30,7 +30,7 @@ def id_from_arti(title, salt, key):
         title += (16-len(title))*"."
     if(len(salt)<12):
         salt += (12-len(salt))*"."
-    return(id_from_string(title[-16]+salt[6:18],key))
+    return(id_from_string(title[:16]+salt[6:19],key))
 
 
 ########### article object to be retrieved rss feed ###########
