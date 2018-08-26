@@ -87,12 +87,13 @@ class RSSfeed(object):
     def refresh(self):
         count = 0
         d = feedparser.parse(self.source)
+        self.last_updated = datetime.datetime.now()
         for entry in d['entries']:
             if(count >= self.max): break
             try:
                 stamp = dateutil.parser.parse(entry['published'])
             except (KeyError, ValueError):
-                stamp = datetime.datetime.now()
+                stamp = self.last_updated
                 z("(RSSfeed)    refresh(): datetime assumed to be now.",debug=self.config.debug)
             try:
                 id = id_from_string(str(entry['id']),self.config.SECRET_KEY)
@@ -107,7 +108,6 @@ class RSSfeed(object):
                 newentry = True
             z("(RSSfeed)  refresh() " + str(count) + ' new:' + str(newentry) + ' ' + id + ' @' + str(stamp) + ' ' + entry['title'][:16],debug=self.config.debug)
             count += 1
-        self.last_updated = datetime.datetime.now()
 
     # count unseen articles
     def unseen(self):
