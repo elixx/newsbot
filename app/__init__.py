@@ -87,7 +87,7 @@ class NewsBot(object):
                 feed.refresh()
                 self.kill = False
                 if(feed.unseen() > 0):
-                    output = str(count) + ' ' + feed.output()
+                    output = str(count) + '/' + str(len(self.allfeeds)) + feed.output()
                     print(output)
                     if self.config.broadcast: self.mwh.send(output)
                     z("(run) Storing state to .nbfeed",debug=self.config.debug)
