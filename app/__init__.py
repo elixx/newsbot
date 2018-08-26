@@ -70,7 +70,7 @@ class NewsBot(object):
         initstr += 'feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
         initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay) + ' sec` maxfetch:`' + str(self.config.maxi) + '`\n'
         if(cacheloaded != True):
-            initstr += "#### Starting new `.nbfeed`.\n"
+            initstr += "#### :skull_and_crossbones: Creating new `.nbfeed`.\n"
         if(self.config.broadcast == True and self.firstrun == True):
             self.firstrun = False
             self.mwh = Webhook(self.config.baseURL, self.config.hook)

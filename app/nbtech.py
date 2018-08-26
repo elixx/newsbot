@@ -46,7 +46,10 @@ class article(object):
 
     # return article entry as markdown string
     def tostr(self):
-        dumpstr = '* **' + self.title + '** @`' + self.stamp.strftime("%Y-%m-%d %H:%M:%S") + '` ' + self.link + '\n'
+#        dumpstr = '* **' + self.title + '** @`' + self.stamp.strftime("%Y-%m-%d %H:%M:%S") + '` ' + self.link + '\n' # original format
+#        dumpstr = '* `' + self.stamp.strftime("%Y-%m-%d %H:%M") + '` **' +  self.title + '** [link]('+ self.link + ')\n' # this is nice but no link previews
+#        dumpstr = '* `' + self.stamp.strftime("%Y-%m-%d %H:%M") + '` **' +  self.title + '** - '+ self.link + '\n' # leading timestamp
+        dumpstr = '* **' +  self.title + '** - '+ self.link + '\n' # most concise
         return(dumpstr)
 
 
@@ -66,7 +69,7 @@ class RSSfeed(object):
     # return all articles as markdown string and mark articles as seen
     def output(self):
         #a = '### ' + str(self.title) + ' ###' + '\n'
-        a = '### :newspaper: ' + str(self.title) + '\n'
+        a = '#### :newspaper: ' + str(self.title) + '\n'
         count = 1
         for arti in self.articles.values():
             if(arti.seen == False):
@@ -88,18 +91,23 @@ class RSSfeed(object):
             except (KeyError, ValueError):
                 stamp = self.last_updated
                 nostamp = True
-            try:
+            if 'id' in entry.keys():
                 id = id_from_string(str(entry['id']),self.config.SECRET_KEY)
-            except KeyError:
+            elif 'guid' in entry.keys():
+                id = id_from_string(str(entry['guid']),self.config.SECRET_KEY)
+            elif 'link' in entry.keys():
                 id = id_from_string(str(entry['link']),self.config.SECRET_KEY)
+            elif 'title' in entry.keys():
+                id = id_from_string(str(entry['title']),self.config.SECRET_KEY)
+
             art = article(id=id,title=str(entry['title']), link=str(entry['link']),source=str(self.source),stamp=stamp)
             try:
-                assert(self.articles[id] is not None)       # This faulty logic is the problem with new article detection
+                assert(self.articles[id] is not None)
                 newentry = False
             except KeyError:
                 self.articles[id] = art
                 newentry = True
-            z("(RSSfeed) refresh() " + str(count) + ' new:' + str(newentry) + ' ' + id + ' @' + str(stamp) + ' ' + str(nostamp) + ' ' + entry['title'][:18],debug=self.config.debug)
+            z("(RSSfeed) refresh() " + ' new:' + str(newentry) + ' ' + id + ' ' + str(stamp) + ' ' + str(nostamp) + ' ' + entry['title'][:18],debug=self.config.debug)
             count += 1
 
     # count unseen articles
@@ -108,5 +116,5 @@ class RSSfeed(object):
         for arti in self.articles.values():
             if(arti.seen == False):
                 count += 1
-        z("(RSSfeed) " + self.source + " Unseen articles: "+str(count),debug=self.config.debug)
+        z("(RSSfeed) unseen() "+str(count),debug=self.config.debug)
         return(count)
