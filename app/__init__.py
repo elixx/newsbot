@@ -66,11 +66,11 @@ class NewsBot(object):
         file.close()
 
         # announce startup
-        initstr = '### NewsBot ' + self.config.VERSION + ' starting...\n'
-        initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
-        initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay) + ' sec` max:`' + str(self.config.maxi) + '`\n'
+        initstr = '### :skull: NewsBot ' + self.config.VERSION + ' starting...\n'
+        initstr += 'feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
+        initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay) + ' sec` maxfetch:`' + str(self.config.maxi) + '`\n'
         if(cacheloaded != True):
-            initstr += "#### Article cache purged. ####\n"
+            initstr += "#### Starting new `.nbfeed`.\n"
         if(self.config.broadcast == True and self.firstrun == True):
             self.firstrun = False
             self.mwh = Webhook(self.config.baseURL, self.config.hook)
@@ -87,7 +87,7 @@ class NewsBot(object):
                 feed.refresh()
                 self.kill = False
                 if(feed.unseen() > 0):
-                    output = str(count) + '/' + str(len(self.allfeeds)) + feed.output()
+                    output = feed.output() + "\n:hourglass_flowing_sand: _" + str(count) + '/' + str(len(self.allfeeds)) + "_\n"
                     print(output)
                     if self.config.broadcast: self.mwh.send(output)
                     z("(run) Storing state to .nbfeed",debug=self.config.debug)
