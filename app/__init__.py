@@ -68,7 +68,7 @@ class NewsBot(object):
         # announce startup
         initstr = '### NewsBot ' + self.config.VERSION + ' starting...\n'
         initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
-        initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay/60) + ' min` max:`' + str(self.config.maxi) + '`\n'
+        initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay) + ' sec` max:`' + str(self.config.maxi) + '`\n'
         if(cacheloaded != True):
             initstr += "#### Article cache purged. ####\n"
         if(self.config.broadcast == True and self.firstrun == True):
@@ -87,7 +87,7 @@ class NewsBot(object):
                 feed.refresh()
                 self.kill = False
                 if(feed.unseen() > 0):
-                    output = feed.output()
+                    output = str(count) + ' ' + feed.output()
                     print(output)
                     if self.config.broadcast: self.mwh.send(output)
                     z("(run) Storing state to .nbfeed",debug=self.config.debug)
