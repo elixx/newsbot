@@ -69,6 +69,8 @@ class NewsBot(object):
         initstr = '### NewsBot ' + self.config.VERSION + ' starting...\n'
         initstr += 'cache:`' + str(cacheloaded) + '` feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
         initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay/60) + ' min` max:`' + str(self.config.maxi) + '`\n'
+        if(cacheloaded != True):
+            initstr += "#### Article cache purged. ####\n"
         if(self.config.broadcast == True and self.firstrun == True):
             self.firstrun = False
             self.mwh = Webhook(self.config.baseURL, self.config.hook)

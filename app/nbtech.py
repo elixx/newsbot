@@ -17,6 +17,10 @@ def z(*text, debug=True):
 ########### arbitrarily hashid a string with salt from config SECRET_KEY ###########
 def id_from_string(string,key):
     val = []
+    if(len(string) > 64):
+        string = string[0:63]
+    if(len(string) < 64):
+        string += (64-len(string))*"."
     for char in string:
         tempstr = char.encode("utf-8")
         val.append(tempstr.hex())
@@ -25,12 +29,12 @@ def id_from_string(string,key):
     return(hashids.encode_hex(tmp))
 
 ########### take article data and arbitrarily generate hashid ###########
-def id_from_arti(title, salt, key):
-    if(len(title)<32):
-        title += (32-len(title))*"."
-    if(len(salt)<12):
-        salt += (12-len(salt))*"."
-    return(id_from_string(title[:32]+salt[6:19],key))
+#def id_from_arti(title, salt, key):
+#    if(len(title)<32):
+#        title += (32-len(title))*"."
+#    if(len(salt)<12):
+#        salt += (12-len(salt))*"."
+#    return(id_from_string(title[:32]+salt[6:19],key))
 
 
 ########### article object to be retrieved rss feed ###########
@@ -45,7 +49,7 @@ class article(object):
         self.id=id
         if(self.id == ''):
             if(self.title==''): self.title=self.link
-            self.id = id_from_arti(self.title,str(self.stamp),key)
+            self.id = id_from_string(self.title,str(self.stamp),key)
         else:
             self.id = id
 
@@ -86,20 +90,22 @@ class RSSfeed(object):
         for entry in d['entries']:
             if(count >= self.max): break
             try:
-                stamp = entry['published']
-                stamp = dateutil.parser.parse(stamp)
+                stamp = dateutil.parser.parse(entry['published'])
             except (KeyError, ValueError):
                 stamp = datetime.datetime.now()
                 z("(RSSfeed)    refresh(): datetime assumed to be now.",debug=self.config.debug)
-            id = id_from_arti(str(entry['title']),self.source,self.config.SECRET_KEY)
+            try:
+                id = id_from_string(str(entry['id']),self.config.SECRET_KEY)
+            except KeyError:
+                id = id_from_string(str(entry['title'])+str(stamp),self.config.SECRET_KEY)
             art = article(id=id,title=str(entry['title']), link=str(entry['link']),source=str(self.source),stamp=stamp)
             try:
-                assert(self.articles[id] is not None)
+                assert(self.articles[id] is not None)       # This faulty logic is the problem with new article detection
                 newentry = False
             except KeyError:
                 self.articles[id] = art
                 newentry = True
-            z("(RSSfeed)  refresh() " + str(count) + ' new:' + str(newentry) + ' ' + id + '@' + str(stamp) + ' ' + entry['title'][:16],debug=self.config.debug)
+            z("(RSSfeed)  refresh() " + str(count) + ' new:' + str(newentry) + ' ' + id + ' @' + str(stamp) + ' ' + entry['title'][:16],debug=self.config.debug)
             count += 1
         self.last_updated = datetime.datetime.now()
 
