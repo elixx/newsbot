@@ -4,15 +4,12 @@ import feedparser
 from hashids import Hashids
 from random import shuffle
 
-def __init__():
-    print("nbtech.py")
-
 ########### this is how we do debug output ###########
 def z(*text, debug=True):
     if(debug==True):
         s=''
         for n in text: s += str(n) + ' '
-        print('debug | ',str(datetime.datetime.now())+'  ',s)
+        print(str(datetime.datetime.now())+'\t',s)
 
 ########### arbitrarily hashid a string with salt from config SECRET_KEY ###########
 def id_from_string(string,key):
@@ -91,14 +88,18 @@ class RSSfeed(object):
             except (KeyError, ValueError):
                 stamp = self.last_updated
                 nostamp = True
-            if 'id' in entry.keys():
-                id = id_from_string(str(entry['id']),self.config.SECRET_KEY)
-            elif 'guid' in entry.keys():
-                id = id_from_string(str(entry['guid']),self.config.SECRET_KEY)
-            elif 'link' in entry.keys():
-                id = id_from_string(str(entry['link']),self.config.SECRET_KEY)
-            elif 'title' in entry.keys():
-                id = id_from_string(str(entry['title']),self.config.SECRET_KEY)
+            for key in ['id','guid','link','title']:
+                if key in entry.keys():
+                    id = id_from_string(str(entry[key]),self.config.SECRET_KEY)
+                    break
+#            if 'id' in entry.keys():
+#                id = id_from_string(str(entry['id']),self.config.SECRET_KEY)
+#            elif 'guid' in entry.keys():
+#                id = id_from_string(str(entry['guid']),self.config.SECRET_KEY)
+#            elif 'link' in entry.keys():
+#                id = id_from_string(str(entry['link']),self.config.SECRET_KEY)
+#            elif 'title' in entry.keys():
+#                id = id_from_string(str(entry['title']),self.config.SECRET_KEY)
 
             art = article(id=id,title=str(entry['title']), link=str(entry['link']),source=str(self.source),stamp=stamp)
             try:
@@ -107,7 +108,7 @@ class RSSfeed(object):
             except KeyError:
                 self.articles[id] = art
                 newentry = True
-            z("(RSSfeed) refresh() " + ' new:' + str(newentry) + ' ' + id + ' ' + str(stamp) + ' ' + str(nostamp) + ' ' + entry['title'][:18],debug=self.config.debug)
+            z("RSSfeed.refresh() " + ' new:' + str(newentry) + ' ' + id + ' ' + str(stamp) + ' ' + str(nostamp) + ' ' + entry['title'][:18],debug=self.config.debug)
             count += 1
 
     # count unseen articles
@@ -116,5 +117,5 @@ class RSSfeed(object):
         for arti in self.articles.values():
             if(arti.seen == False):
                 count += 1
-        z("(RSSfeed) unseen() "+str(count),debug=self.config.debug)
+        z("RSSfeed.unseen() "+str(count),debug=self.config.debug)
         return(count)

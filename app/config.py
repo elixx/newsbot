@@ -4,7 +4,7 @@ import configparser
 
 class Config(object):
     def __init__(self, filename='config.conf'):
-        self.VERSION="v1.260"
+        self.VERSION="v1.261"
         self.ON = ["1","true","yes"]
         self.cp = configparser.ConfigParser()
         try:
@@ -18,18 +18,18 @@ class Config(object):
             file.write("[feeds]\n")
             file.close()
             SECRET_KEY = seed
-            print("Default skeleton config created.")
+            print("config\t|  Default skeleton config created.")
             raise BaseException("BaseConfigGen")
-        print('config __init__ done') ########################
+        print('config\t|  init done') ########################
 
     def reload(self,filename='config.conf'):
         try:
             assert(os.path.isfile(filename) == True)
             self.filename = filename
             self.cp.read(filename)
-            print("reload continuing")
+            print("config\t|  reload continuing")
         except:
-            print("reload config file failed!")
+            print("config\t|  reload config file failed!")
             print('punt!!')
             exit()
 
@@ -49,8 +49,8 @@ class Config(object):
         self.outputdelay = (self.refresh*60 / len(self.feedURLs))
 
         if(self.feedURLs is None):
-            print('config: no feed URLs')
+            print('config\t|   no feed URLs')
         else:
-            print('config: loaded feeds:')
+            print('config\t|   loaded feeds:')
             for feed in self.feedURLs:
                 print(feed)
