@@ -46,7 +46,7 @@ class article(object):
 #        dumpstr = '* **' + self.title + '** @`' + self.stamp.strftime("%Y-%m-%d %H:%M:%S") + '` ' + self.link + '\n' # original format
 #        dumpstr = '* `' + self.stamp.strftime("%Y-%m-%d %H:%M") + '` **' +  self.title + '** [link]('+ self.link + ')\n' # this is nice but no link previews
 #        dumpstr = '* `' + self.stamp.strftime("%Y-%m-%d %H:%M") + '` **' +  self.title + '** - '+ self.link + '\n' # leading timestamp
-        dumpstr = '* **' +  self.title + '** - '+ self.link + '\n' # most concise
+        dumpstr = '* ' +  self.title + ' - '+ self.link + '\n' # most concise
         return(dumpstr)
 
 
@@ -66,7 +66,8 @@ class RSSfeed(object):
     # return all articles as markdown string and mark articles as seen
     def output(self):
         #a = '### ' + str(self.title) + ' ###' + '\n'
-        a = '#### :newspaper: ' + str(self.title) + '\n'
+        #a = '#### :newspaper: ' + str(self.title) + '\n'
+        a = ':newspaper: ** ' + str(self.title) + ' **\n'
         count = 1
         for arti in self.articles.values():
             if(arti.seen == False):
@@ -92,14 +93,6 @@ class RSSfeed(object):
                 if key in entry.keys():
                     id = id_from_string(str(entry[key]),self.config.SECRET_KEY)
                     break
-#            if 'id' in entry.keys():
-#                id = id_from_string(str(entry['id']),self.config.SECRET_KEY)
-#            elif 'guid' in entry.keys():
-#                id = id_from_string(str(entry['guid']),self.config.SECRET_KEY)
-#            elif 'link' in entry.keys():
-#                id = id_from_string(str(entry['link']),self.config.SECRET_KEY)
-#            elif 'title' in entry.keys():
-#                id = id_from_string(str(entry['title']),self.config.SECRET_KEY)
 
             art = article(id=id,title=str(entry['title']), link=str(entry['link']),source=str(self.source),stamp=stamp)
             try:

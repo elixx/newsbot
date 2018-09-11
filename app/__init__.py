@@ -64,17 +64,22 @@ class NewsBot(object):
         file = open('.nbfeed','wb')
         pickle.dump(self.allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
         file.close()
+        nbsize = os.path.getsize('.nbfeed')
 
         # announce startup
         initstr = '### :skull: NewsBot ' + self.config.VERSION + ' starting...\n'
-        initstr += 'feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
-        initstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay) + ' sec` maxfetch:`' + str(self.config.maxi) + '`\n'
+        cfgstr = 'feeds:`' + str(len(self.config.feedURLs)) + '` ' + 'refresh:`'
+        cfgstr += str(self.config.refresh) + ' min` delay:`' + str(self.config.outputdelay) + ' sec` cachesize:`' + str(nbsize) + ' bytes`\n'
         if(cacheloaded != True):
-            initstr += "#### :skull_and_crossbones: Created new `.nbfeed`.\n"
+            initstr += "#### :skull_and_crossbones: " + cfgstr
+        else:
+            initstr += ":globe_with_meridians: " + cfgstr
         if(self.config.broadcast == True and self.firstrun == True):
             self.firstrun = False
             self.mwh = Webhook(self.config.baseURL, self.config.hook)
             self.mwh.send(initstr)
+        elif self.config.broadcast == False:
+            print(initstr)
 
     ## tight loop through allfeeds{} - refresh and output the feeds
     def run(self):
@@ -88,7 +93,11 @@ class NewsBot(object):
                 if(feed.unseen() > 0):
                     output = feed.output() + "\n:hourglass_flowing_sand: _" + str(count) + '/' + str(len(self.allfeeds)) + "_\n"
                     print(output.replace('\n','\n\t'))
-                    if self.config.broadcast: self.mwh.send(output)
+                    if self.config.broadcast:
+                        try:
+                            self.mwh.send(output)
+                        except:
+                            print("*** run(): problem sending to mattermost ***")
                     z("NewsBot - Storing state to .nbfeed",debug=self.config.debug)
                     file = open('.nbfeed','wb')
                     pickle.dump(self.allfeeds,file,protocol=pickle.HIGHEST_PROTOCOL)
